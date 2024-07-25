@@ -1,11 +1,13 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signInStart, signInFailure, signInSuccess } from "../redux/user/userSlice";
 export default function SignIn() {
 
   const [formData, setFormData] = useState({})
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const {loading, error : errorMessage } = useSelector(state => state.user) 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   
   const handleChange = (e) => {
@@ -13,12 +15,11 @@ export default function SignIn() {
   }
   const handleSubmit = async(e) => {
     e.preventDefault();
-    if(!formData.username || !formData.email || !formData.password){
-      return setErrorMessage('Please fill all fields')
+    if(!formData.email || !formData.password){
+      return dispatch(signInFailure('please fill all the fields'))
     }
     try {
-      setLoading(true)
-      setErrorMessage(null)
+      dispatch(signInStart())
       const res = await fetch('api/auth/signin', {
         method : 'POST',
         headers : { 'Content-Type' : 'application/json'},
@@ -26,15 +27,14 @@ export default function SignIn() {
       })
       const data = await res.json()
       if ( data.success === false) {
-        return errorMessage(data.message)
+        dispatch(signInFailure(data.message))
       }
-      setLoading(false)
       if(res.ok){
+        dispatch(signInSuccess(data))
         navigate('/')
       }
     } catch (error) {
-      setErrorMessage(error.message)
-      setLoading(false)
+      dispatch(signInFailure(error.message))
     }
   }
 
@@ -44,7 +44,7 @@ export default function SignIn() {
         <div className="flex-1">
           <Link to="/" className="font-bold dark:text-white text-4xl">
             <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
-              Yashasvi
+              People
             </span>
             Blog
           </Link>
