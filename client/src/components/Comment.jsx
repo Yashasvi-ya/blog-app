@@ -62,9 +62,9 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
           <span className="font-bold mr-1 text-xs truncate">
             {user ? `@${user.username}` : "anonymous user"}
           </span>
-          <span className="text-gray-500 text-xs">
+          {/* <span className="text-gray-500 text-xs">
             {moment(comment.createdAt).fromNow()} 
-          </span>
+          </span> */}
         </div>
         {isEditing ? (
           <>
